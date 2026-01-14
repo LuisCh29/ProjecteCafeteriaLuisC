@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_menjar"
+        android:icon="@drawable/menjar"
+        android:title="Menjar" />
+
+    <item
+        android:id="@+id/nav_begudes"
+        android:icon="@drawable/beguda"
+        android:title="Begudes" />
+
+    <item
+        android:id="@+id/nav_postres"
+        android:icon="@drawable/postres"
+        android:title="Postres" />
+
+    <item
+        android:id="@+id/nav_cistella"
+        android:icon="@drawable/cistella"
+        android:title="Cistella" />
+
+</menu>
