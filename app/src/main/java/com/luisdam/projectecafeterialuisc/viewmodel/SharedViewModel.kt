@@ -13,6 +13,12 @@ class SharedViewModel : ViewModel() {
     private val _usuariActual = MutableLiveData<String?>()
     val usuariActual: LiveData<String?> = _usuariActual
 
+    private val _usuariId = MutableLiveData<String>("")
+    val usuariId: LiveData<String> = _usuariId
+
+    private val _usuariEmail = MutableLiveData<String>("")
+    val usuariEmail: LiveData<String> = _usuariEmail
+
     fun afegirACistella(producte: Producte) {
         val currentList = _cistellaItems.value ?: mutableListOf()
         currentList.add(producte)
@@ -23,8 +29,18 @@ class SharedViewModel : ViewModel() {
         _cistellaItems.value = mutableListOf()
     }
 
-    fun setUsuariActual(username: String) {
-        _usuariActual.value = username
+    fun setUsuariActual(nom: String, id: String, email: String = "") {
+        _usuariActual.value = nom
+        _usuariId.value = id
+        _usuariEmail.value = email
+    }
+
+    fun setUsuariId(id: String) {
+        _usuariId.value = id
+    }
+
+    fun setUsuariNom(nom: String) {
+        _usuariActual.value = nom
     }
 
     fun getPreuTotal(): Double {
@@ -33,5 +49,12 @@ class SharedViewModel : ViewModel() {
 
     fun getQuantitatTotal(): Int {
         return _cistellaItems.value?.size ?: 0
+    }
+
+    fun logout() {
+        _usuariActual.value = null
+        _usuariId.value = ""
+        _usuariEmail.value = ""
+        buidarCistella()
     }
 }

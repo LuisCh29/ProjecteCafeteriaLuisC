@@ -7,10 +7,15 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.lifecycle.lifecycleScope
+import com.luisdam.projectecafeterialuisc.data.firebase.FirestoreService
 import com.luisdam.projectecafeterialuisc.databinding.FragmentCistellaBinding
+import com.luisdam.projectecafeterialuisc.model.Comanda
+import com.luisdam.projectecafeterialuisc.model.ProducteComanda
 import com.luisdam.projectecafeterialuisc.ui.adapters.CistellaAdapter
 import com.luisdam.projectecafeterialuisc.viewmodel.SharedViewModel
+import kotlinx.coroutines.launch
+import java.util.Date
 
 class CistellaFragment : Fragment() {
 
@@ -19,6 +24,7 @@ class CistellaFragment : Fragment() {
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var cistellaAdapter: CistellaAdapter
+    private val firestoreService = FirestoreService()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,7 +46,7 @@ class CistellaFragment : Fragment() {
         cistellaAdapter = CistellaAdapter()
 
         binding.rvCistella.apply {
-            layoutManager = LinearLayoutManager(requireContext())
+            layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
             adapter = cistellaAdapter
             setHasFixedSize(true)
         }
@@ -88,12 +94,48 @@ class CistellaFragment : Fragment() {
     private fun comprarCistella() {
         val total = sharedViewModel.getPreuTotal()
         if (total > 0) {
-            Toast.makeText(
-                requireContext(),
-                "Compra realitzada per %.2f€".format(total),
-                Toast.LENGTH_LONG
-            ).show()
-            sharedViewModel.buidarCistella()
+            val usuariNom = sharedViewModel.usuariActual.value ?: "Anonymous"
+            val usuariId = sharedViewModel.usuariId.value ?: ""
+            val items = sharedViewModel.cistellaItems.value ?: emptyList()
+
+            lifecycleScope.launch {
+                binding.progressBar.visibility = View.VISIBLE
+
+                // Crear comanda para Firebase
+                val comanda = Comanda(
+                    usuariId = usuariId,
+                    usuariNom = usuariNom,
+                    total = total,
+                    data = Date(),
+                    estat = "Completada",
+                    productes = items.map { producte ->
+                        ProducteComanda(
+                            nom = producte.nom,
+                            preu = producte.preu,
+                            quantitat = 1
+                        )
+                    }
+                )
+
+                val result = firestoreService.guardarComanda(comanda)
+
+                binding.progressBar.visibility = View.GONE
+
+                if (result.isSuccess) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Compra realitzada per %.2f€".format(total),
+                        Toast.LENGTH_LONG
+                    ).show()
+                    sharedViewModel.buidarCistella()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "Error: ${result.exceptionOrNull()?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         } else {
             Toast.makeText(requireContext(), "La cistella està buida", Toast.LENGTH_SHORT).show()
         }

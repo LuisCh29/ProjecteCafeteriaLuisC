@@ -72,4 +72,13 @@
         android:text="Registrar-se"
         android:backgroundTint="@color/colorSecondary" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        android:layout_marginTop="16dp"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_gravity="center"/>
+
 </LinearLayout>

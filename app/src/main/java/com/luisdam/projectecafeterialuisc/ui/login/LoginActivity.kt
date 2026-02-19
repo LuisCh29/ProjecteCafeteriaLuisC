@@ -1,26 +1,29 @@
 package com.luisdam.projectecafeterialuisc.ui.login
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import com.luisdam.projectecafeterialuisc.data.firebase.FirebaseAuthService
 import com.luisdam.projectecafeterialuisc.databinding.ActivityLoginBinding
 import com.luisdam.projectecafeterialuisc.ui.menu.MenuActivity
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginBinding
-
-    companion object {
-        private const val PREFS_NAME = "CafeteriaPrefs"
-        private const val KEY_PASSWORD_PREFIX = "password_"
-    }
+    private val authService = FirebaseAuthService()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (authService.isLoggedIn()) {
+            navigateToMenu()
+            return
+        }
 
         setupListeners()
     }
@@ -36,50 +39,49 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUser() {
-        val username = binding.etUsername.text.toString().trim()
+        val email = binding.etUsername.text.toString().trim()
         val password = binding.etPassword.text.toString().trim()
 
-        if (validateInput(username, password)) {
-            if (authenticateUser(username, password)) {
-                saveCurrentUser(username)
-                navigateToMenu(username)
-            } else {
-                Toast.makeText(this, "Usuari o contrasenya incorrectes", Toast.LENGTH_SHORT).show()
+        if (validateInput(email, password)) {
+            lifecycleScope.launch {
+                binding.progressBar.visibility = android.view.View.VISIBLE
+
+                val result = authService.login(email, password)
+
+                binding.progressBar.visibility = android.view.View.GONE
+
+                if (result.isSuccess) {
+                    Toast.makeText(this@LoginActivity, "Login correcte", Toast.LENGTH_SHORT).show()
+                    navigateToMenu()
+                } else {
+                    Toast.makeText(
+                        this@LoginActivity,
+                        "Error: ${result.exceptionOrNull()?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
         }
     }
 
-    private fun validateInput(username: String, password: String): Boolean {
-        if (username.isEmpty()) {
-            binding.etUsername.error = "Introdueix l'usuari"
+    private fun validateInput(email: String, password: String): Boolean {
+        if (email.isEmpty()) {
+            binding.etUsername.error = "Introdueix el correu"
             return false
         }
         if (password.isEmpty()) {
             binding.etPassword.error = "Introdueix la contrasenya"
             return false
         }
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            binding.etUsername.error = "Correu electrònic invàlid"
+            return false
+        }
         return true
     }
 
-    private fun authenticateUser(username: String, password: String): Boolean {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-
-        if (username == "admin" && password == "1234") {
-            return true
-        }
-
-        val savedPassword = prefs.getString("${KEY_PASSWORD_PREFIX}$username", null)
-        return savedPassword == password
-    }
-
-    private fun saveCurrentUser(username: String) {
-        val prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit().putString("currentUser", username).apply()
-    }
-
-    private fun navigateToMenu(username: String) {
+    private fun navigateToMenu() {
         val intent = Intent(this, MenuActivity::class.java)
-        intent.putExtra("USERNAME", username)
         startActivity(intent)
         finish()
     }

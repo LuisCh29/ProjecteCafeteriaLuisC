@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "442990038389",
+    "project_id": "cafeteriacowfee",
+    "storage_bucket": "cafeteriacowfee.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:442990038389:android:c43a937b7c8ed93116973c",
+        "android_client_info": {
+          "package_name": "com.luisdam.projectecafeterialuisc"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDH1AR_NP2oJh92Hs_IcbekbPpTBAQJwQ4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

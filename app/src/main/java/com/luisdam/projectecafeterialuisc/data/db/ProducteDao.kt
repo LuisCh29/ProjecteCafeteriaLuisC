@@ -22,6 +22,12 @@ interface ProducteDao {
     @Query("SELECT * FROM productes")
     fun getAllProductes(): LiveData<List<ProducteEntity>>
 
+    @Query("SELECT * FROM productes")
+    suspend fun getAllProductesNonLive(): List<ProducteEntity>
+
     @Query("DELETE FROM productes")
     suspend fun deleteAllProductes()
+
+    @Query("SELECT * FROM productes WHERE id = :id")
+    suspend fun getProducteById(id: Int): ProducteEntity?
 }

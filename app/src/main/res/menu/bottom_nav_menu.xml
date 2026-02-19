@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
         android:id="@+id/nav_menjar"
@@ -20,5 +21,11 @@
         android:id="@+id/nav_cistella"
         android:icon="@drawable/cistella"
         android:title="Cistella" />
+
+    <item
+        android:id="@+id/nav_historial"
+        android:icon="@drawable/historial"
+        android:title="Historial"
+        app:showAsAction="ifRoom" />
 
 </menu>
