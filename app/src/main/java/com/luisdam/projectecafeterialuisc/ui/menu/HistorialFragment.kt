@@ -120,7 +120,6 @@ class HistorialFragment : Fragment() {
                     binding.rvHistorial.visibility = View.VISIBLE
                     historialAdapter.actualizarComandes(comandesList)
 
-                    // Calcular estadísticas
                     calcularEstadisticas()
                 } else {
                     mostrarMensajeVacio()
